@@ -7,9 +7,9 @@ export const config = {
   maxDuration: 60,
 };
 
-const TARGET_BASE = (process.env.TARGET_DOMAIN || "").replace(/\/$/, "");
+const TARG = (process.env.TARGET_DOMAIN || "").replace(/\/$/, "");
 
-const STRIP_HEADERS = new Set([
+const STRH = new Set([
   "host",
   "connection",
   "keep-alive",
@@ -26,20 +26,20 @@ const STRIP_HEADERS = new Set([
 ]);
 
 export default async function handler(req, res) {
-  if (!TARGET_BASE) {
+  if (!TARG) {
     res.statusCode = 500;
     return res.end("Misconfigured: TARGET_DOMAIN is not set");
   }
 
   try {
-    const targetUrl = TARGET_BASE + req.url;
+    const targetUrl = TARG + req.url;
 
     const headers = {};
     let clientIp = null;
     for (const key of Object.keys(req.headers)) {
       const k = key.toLowerCase();
       const v = req.headers[key];
-      if (STRIP_HEADERS.has(k)) continue;
+      if (STRH.has(k)) continue;
       if (k.startsWith("x-vercel-")) continue;
       if (k === "x-real-ip") { clientIp = v; continue; }
       if (k === "x-forwarded-for") { if (!clientIp) clientIp = v; continue; }
